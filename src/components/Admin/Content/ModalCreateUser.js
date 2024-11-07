@@ -2,7 +2,8 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { SlPlus } from "react-icons/sl";
-import axios from 'axios';
+import { postCreateNewUser } from '../../services/apiService';
+import { ToastContainer, toast } from 'react-toastify';
 
 const ModalCreateUser = (props) => {
     const { show, setShow } = props; //lay dc prop tu cha tryen xuong, prop la 1 bien obj
@@ -31,8 +32,24 @@ const ModalCreateUser = (props) => {
             // setPreviewImage("")
         }
     }
+    const validateEmail = (email) => {
+        return String(email)
+            .toLowerCase()
+            .match(
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            );
+    };
     const handleSubmitCreateUsr = async() => {
         //validate
+        const isValidEmail = validateEmail(email);
+        if(!isValidEmail){
+            toast.error("invalid Email")
+            return
+        }
+        if(!password){
+            toast.error("invalid Password")
+            return
+        }
 
         //call api
         // let data = {
@@ -43,18 +60,18 @@ const ModalCreateUser = (props) => {
         //     userImage:image
         // }
         // console.log(data)
-        const FormData = require('form-data');
+        
 
-        const data = new FormData();
-        data.append('email', email);
-        data.append('password', password);
-        data.append('username', username);
-        data.append('role', role);
-        data.append('userImage', data);
-
-        let res = await axios.post('http://localhost:8081/api/v1/participant', data)
-        console.log("check ___-", res)
+        let data = await postCreateNewUser(email, password, username, role, image)
+        if(data && data.EC === 0){
+            toast.success(data.EM)
+            handleClose()
+            await props.fetchListUsers()
     }
+        if(data && data.EC !== 0){
+        toast.error(data.EM)
+    }
+}
     const [previewImage, setPreviewImage] = useState("")
 
     return (
