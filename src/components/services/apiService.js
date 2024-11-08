@@ -15,4 +15,19 @@ const postCreateNewUser = (email, password, username, role, image) => {
 const getAllUser = () =>{
     return axios.get('api/v1/participant/all')
 }
-export {postCreateNewUser, getAllUser}
+
+const putUpdateUser = (id, username, role, image) => {
+
+    const FormData = require('form-data');
+    const data = new FormData();
+    data.append('id', id);
+    data.append('username', username);
+    data.append('role', role);
+    data.append('userImage', image);
+    return axios.put('api/v1/participant', data)
+}
+
+const deleteAUser = (userId) =>{
+    return axios.delete('api/v1/participant', {data : {id: userId} })
+}
+export { postCreateNewUser, getAllUser, putUpdateUser , deleteAUser}

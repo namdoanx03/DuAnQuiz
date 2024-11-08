@@ -6,7 +6,7 @@ import { postCreateNewUser, putUpdateUser } from '../../services/apiService';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
 
-const ModalUpdateUser = (props) => {
+const ModalViewUser = (props) => {
     const { show, setShow, dataUpdate } = props; //lay dc prop tu cha tryen xuong, prop la 1 bien obj
 
 
@@ -50,42 +50,6 @@ const ModalUpdateUser = (props) => {
             // setPreviewImage("")
         }
     }
-    const validateEmail = (email) => {
-        return String(email)
-            .toLowerCase()
-            .match(
-                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-            );
-    };
-    const handleSubmitCreateUser = async () => {
-        //validate
-        const isValidEmail = validateEmail(email);
-        if (!isValidEmail) {
-            toast.error("invalid Email")
-            return
-        }
-
-        //call api
-        // let data = {
-        //     email: email,
-        //     password: password,
-        //     username: username,
-        //     role: role,
-        //     userImage:image
-        // }
-        // console.log(data)
-
-
-        let data = await putUpdateUser(dataUpdate.id, username, role, image)
-        if (data && data.EC === 0) {
-            toast.success(data.EM)
-            handleClose()
-            await props.fetchListUsers()
-        }
-        if (data && data.EC !== 0) {
-            toast.error(data.EM)
-        }
-    }
 
 
     return (
@@ -96,7 +60,7 @@ const ModalUpdateUser = (props) => {
 
             <Modal show={show} onHide={handleClose} size="xl" backdrop="static" className='modal-add-user'>
                 <Modal.Header closeButton>
-                    <Modal.Title>Update a user</Modal.Title>
+                    <Modal.Title>View a user</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <form className="row g-3">
@@ -110,17 +74,17 @@ const ModalUpdateUser = (props) => {
                         </div>
                         <div className="col-md-6">
                             <label for="inputCity" className="form-label">Username</label>
-                            <input type="text" className="form-control" id="inputCity" value={username} onChange={(event) => setUsername(event.target.value)} />
+                            <input type="text" className="form-control" id="inputCity" value={username} disabled onChange={(event) => setUsername(event.target.value)} />
                         </div>
                         <div className="col-md-4">
                             <label for="inputState" className="form-label">Role</label>
-                            <select id="inputState" className="form-select" value={role} onChange={(event) => setRole(event.target.value)}>
+                            <select id="inputState" disabled className="form-select" value={role} onChange={(event) => setRole(event.target.value)}>
                                 <option value="USER">USER</option>
                                 <option value="ADMIN">ADMIN</option>
                             </select>
                         </div>
-                        <div className='"col-md-12'>
-                            <label className="form-label label-upload" htmlFor="labelUpload">
+                        <div className='"col-md-12' >
+                            <label className="form-label label-upload" htmlFor="labelUpload" >
                                 <SlPlus /> Upload File Image
                             </label>
                             <input type='file' id='labelUpload' hidden onChange={(event) => handleUploadImage(event)} />
@@ -138,13 +102,10 @@ const ModalUpdateUser = (props) => {
                     <Button variant="secondary" onClick={handleClose}>
                         Close
                     </Button>
-                    <Button variant="primary" onClick={() => handleSubmitCreateUser()}>
-                        Save
-                    </Button>
                 </Modal.Footer>
             </Modal>
         </>
     );
 }
 
-export default ModalUpdateUser
+export default ModalViewUser

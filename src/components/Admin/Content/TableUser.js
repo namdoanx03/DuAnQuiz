@@ -1,5 +1,3 @@
-import { useState } from "react"
-
 
 const TableUser = (props) => {
 
@@ -28,8 +26,12 @@ const TableUser = (props) => {
                                 <td>{item.email}</td>
                                 <td>{item.role}</td>
                                 <td>
-                                    <button className="btn btn-success">View</button>
-                                    <button className="btn btn-danger mx-3">Delete</button>
+                                    <button className="btn btn-success"
+                                        onClick={() => props.handleClickBtnUpdate(item)}
+                                    >View</button>
+                                    <button className="btn btn-danger mx-3"
+                                        onClick={() => props.handleClickBtnDelete(item)}
+                                    >Delete</button>
                                     <button className="btn btn-warning"
                                         onClick={() => props.handleClickBtnUpdate(item)}
                                     >Update</button>

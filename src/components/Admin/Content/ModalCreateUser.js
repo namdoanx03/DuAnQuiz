@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { SlPlus } from "react-icons/sl";
 import { postCreateNewUser } from '../../services/apiService';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 const ModalCreateUser = (props) => {
     const { show, setShow } = props; //lay dc prop tu cha tryen xuong, prop la 1 bien obj
