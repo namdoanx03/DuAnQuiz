@@ -3,14 +3,17 @@ import  './ManageUser.scss'
 import { FcPlus } from "react-icons/fc"
 import TableUser from "./TableUser"
 import { useEffect, useState } from "react"
-import { getAllUser } from "../../services/apiService"
+import { getAllUser, getUserWithPaginate } from "../../services/apiService"
 import ModalUpdateUser from "./ModalUpdateUser"
 import ModalViewUser from "./ModalViewUser"
 import ModalDeleteUser from "./ModalDeleteUser"
 
 const ManageUser = (props) => {
+    const LIMIT_USER = 6
+    const[pageCount, setPageCount] = useState(0)
 
     const [showModalCreateUser, setShowModalCreateUser] = useState(false)
+    const [showModalViewUser, setShowModalViewUser] = useState(false)
     const [showModalUpdateUser, setShowModalUpdateUser] = useState(false)
     const [showModalDeleteUser, setShowModalDeleteUser] = useState(false)
     const [dataUpdate, setDataUpdate] = useState({})
@@ -20,7 +23,8 @@ const ManageUser = (props) => {
 
     //componentDidmount
     useEffect(() => {
-        fetchListUsers()
+        // fetchListUsers()
+        fetchListUsersWithPaginate(1)
     }, [])
     // get list user
     const fetchListUsers = async () => {
@@ -28,6 +32,14 @@ const ManageUser = (props) => {
         console.log(res)
         if (res.EC === 0) {
             setListUsers(res.DT)
+        }
+    }
+    const fetchListUsersWithPaginate = async (page) => { //get nguoi dung theo kieu phan trang
+        let res = await getUserWithPaginate(page, LIMIT_USER)
+        if (res.EC === 0) {
+            console.log("check res-dt", res.DT)
+            setListUsers(res.DT.users)
+            setPageCount(res.DT.totalPages)
         }
     }
     const handleClickBtnUpdate = (user) => {
@@ -38,8 +50,11 @@ const ManageUser = (props) => {
     const resetUpdateData = () => {
         setDataUpdate({})
     }
+    const handleClickBtnView = (user) => {
+        setShowModalViewUser(true)
+        setDataUpdate(user)
+    } 
     const handleClickBtnDelete = (user) => {
-        console.log("check--", user)
         setShowModalDeleteUser(true)
         setDataDelete(user)
     }
@@ -55,10 +70,15 @@ const ManageUser = (props) => {
                         <FcPlus /> Add new user</button>
                 </div>
                 <div className="table-users-container">
-                    <TableUser listUsers={listUsers}
+                    <TableUser 
+                    listUsers={listUsers}
+                    handleClickBtnView={handleClickBtnView}
                     handleClickBtnUpdate = {handleClickBtnUpdate}
                     handleClickBtnDelete={handleClickBtnDelete}
+                    fetchListUsersWithPaginate={fetchListUsersWithPaginate}
+                    pageCount={pageCount}
                     />
+                    
                 </div>
                 <ModalCreateUser 
                     show={showModalCreateUser}
@@ -73,8 +93,8 @@ const ManageUser = (props) => {
                     resetUpdateData={resetUpdateData}
                 />
                 <ModalViewUser
-                    show={showModalUpdateUser}
-                    setShow={setShowModalUpdateUser}
+                    show={showModalViewUser}
+                    setShow={setShowModalViewUser}
                     dataUpdate={dataUpdate}
                     resetUpdateData={resetUpdateData}
                 />

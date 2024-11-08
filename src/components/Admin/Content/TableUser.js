@@ -1,8 +1,13 @@
+import ReactPaginate from "react-paginate"
 
 const TableUser = (props) => {
 
-    const {listUsers} =props
+    const { listUsers, pageCount } = props
 
+    const handlePageClick = (event) => {
+        props.fetchListUsersWithPaginate(+event.selected + 1)
+        console.log(`User requested page number ${event.selected}`);
+    };
     
     return (
         <>
@@ -27,7 +32,7 @@ const TableUser = (props) => {
                                 <td>{item.role}</td>
                                 <td>
                                     <button className="btn btn-success"
-                                        onClick={() => props.handleClickBtnUpdate(item)}
+                                        onClick={() => props.handleClickBtnView(item)}
                                     >View</button>
                                     <button className="btn btn-danger mx-3"
                                         onClick={() => props.handleClickBtnDelete(item)}
@@ -47,6 +52,28 @@ const TableUser = (props) => {
                     }
                 </tbody>
             </table>
+            <div className="d-flex justify-content-center">
+                <ReactPaginate
+                    nextLabel="next >"
+                    onPageChange={handlePageClick}
+                    pageRangeDisplayed={3}
+                    marginPagesDisplayed={2}
+                    pageCount={pageCount}
+                    previousLabel="< previous"
+                    pageClassName="page-item"
+                    pageLinkClassName="page-link"
+                    previousClassName="page-item"
+                    previousLinkClassName="page-link"
+                    nextClassName="page-item"
+                    nextLinkClassName="page-link"
+                    breakLabel="..."
+                    breakClassName="page-item"
+                    breakLinkClassName="page-link"
+                    containerClassName="pagination"
+                    activeClassName="active"
+                    renderOnZeroPageCount={null}
+                />
+            </div>
         </>
     )
 }
