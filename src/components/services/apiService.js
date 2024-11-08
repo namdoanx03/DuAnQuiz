@@ -38,4 +38,7 @@ const getUserWithPaginate = (page, limit) => {
 const postLogin = (email, password) => {
     return axios.post(`api/v1//login`, {email, password}) //dang www-form-urlencoded chi can truyen 1 bien obj
 }
-export { postCreateNewUser, getAllUser, putUpdateUser, deleteAUser, getUserWithPaginate , postLogin}
+const postRegister = (email, password) => {
+    return axios.post(`api/v1//register`, {email, password}) 
+}
+export { postCreateNewUser, getAllUser, putUpdateUser, deleteAUser, getUserWithPaginate, postLogin, postRegister }
