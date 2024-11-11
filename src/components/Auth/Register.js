@@ -87,7 +87,7 @@ const Register = (props) => {
                 <div className='form-group'>
                     <label>Username</label>
                     <input type={"text"} className='form-control'
-                        onChange={(event) => setPassword(event.target.value)}
+                        onChange={(event) => setUsername(event.target.value)}
                     />
                 </div>
                 <div>
