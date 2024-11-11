@@ -41,4 +41,10 @@ const postLogin = (email, password) => {
 const postRegister = (email, password) => {
     return axios.post(`api/v1//register`, {email, password}) 
 }
-export { postCreateNewUser, getAllUser, putUpdateUser, deleteAUser, getUserWithPaginate, postLogin, postRegister }
+const getQuizByUser = () => { //su dung access_token de lay bai thi nen khong can truyen vao tham so
+    return axios.get(`api/v1/quiz-by-participant`)
+}
+const getDataQuiz = (id) => {
+    return axios.get(`api/v1/questions-by-quiz?quizId=${id}`)
+}
+export { postCreateNewUser, getAllUser, putUpdateUser, deleteAUser, getUserWithPaginate, postLogin, postRegister, getQuizByUser, getDataQuiz }
