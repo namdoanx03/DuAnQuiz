@@ -36,7 +36,7 @@ const getUserWithPaginate = (page, limit) => {
 }
 
 const postLogin = (email, password) => {
-    return axios.post(`api/v1//login`, {email, password}) //dang www-form-urlencoded chi can truyen 1 bien obj
+    return axios.post(`api/v1//login`, {email, password, delay: 5000}) //dang www-form-urlencoded chi can truyen 1 bien obj
 }
 const postRegister = (email, password) => {
     return axios.post(`api/v1//register`, {email, password}) 
