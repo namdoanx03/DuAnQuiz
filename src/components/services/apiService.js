@@ -47,4 +47,20 @@ const getQuizByUser = () => { //su dung access_token de lay bai thi nen khong ca
 const getDataQuiz = (id) => {
     return axios.get(`api/v1/questions-by-quiz?quizId=${id}`)
 }
-export { postCreateNewUser, getAllUser, putUpdateUser, deleteAUser, getUserWithPaginate, postLogin, postRegister, getQuizByUser, getDataQuiz }
+const postSubmitQuiz = (data) => {
+    return axios.post(`api/v1/quiz-submit`, {...data}) // ...data : copy data 
+}
+const postCreateNewQuiz = (description, name, difficulty, image ) =>{
+    const FormData = require('form-data');
+    const data = new FormData();
+    data.append('description', description);
+    data.append('name', name);
+    data.append('difficulty', difficulty);
+    data.append('quizImage', image);
+    return axios.post('api/v1/quiz', data)
+}
+const getAllQuizForAdmin = () => {
+    return axios.get(`api/v1/quiz/all`)
+}
+export { postCreateNewUser, getAllUser, putUpdateUser, deleteAUser, getUserWithPaginate, 
+    postLogin, postRegister, getQuizByUser, getDataQuiz, postSubmitQuiz, postCreateNewQuiz, getAllQuizForAdmin }

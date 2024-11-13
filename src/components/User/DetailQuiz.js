@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom"; // khai bao mot tham so tren duong link URL
-import { getDataQuiz } from "../services/apiService";
+import { getDataQuiz, postSubmitQuiz } from "../services/apiService";
 import _ from 'lodash';
 import './DetailQuiz.scss'
 import Question from "./Question";
+import ModalResult from "./ModalResult";
 
 const DetailQuiz = (props) => {
     const location = useLocation();
@@ -12,7 +13,10 @@ const DetailQuiz = (props) => {
     const [dataQuiz, setDataQuiz] = useState([])
     const [index, setIndex] = useState(0)
 
-    console.log("check location", location)
+    const [isShowModalResult, setIsShowModalResult] = useState(false)
+    const [dataModalResult, setDataModalResult] = useState({})
+
+    // console.log("check location", location)
 
     useEffect(() => {
         fetchQuestion()
@@ -20,7 +24,7 @@ const DetailQuiz = (props) => {
 
     const fetchQuestion = async () => {
         let res = await getDataQuiz(quizId)
-        console.log("check question", res)
+        // console.log("check question", res) 
         if (res && res.EC === 0) {
             let raw = res.DT
             let data = _.chain(raw)
@@ -45,7 +49,7 @@ const DetailQuiz = (props) => {
             setDataQuiz(data)
         }
     }
-    console.log("check dataQuiz", dataQuiz)
+    // console.log("check dataQuiz", dataQuiz)
 
     const handlePre = () => {
         if(index - 1 < 0) return 
@@ -54,6 +58,61 @@ const DetailQuiz = (props) => {
     const handleNext = () => {
         if(dataQuiz && dataQuiz.length > index + 1)
             setIndex(index + 1)
+    }
+    const handleFinishQuiz = async () => {
+        // {
+        //     "quizId": 1,
+        //         "answers": [
+        //             {
+        //                 "questionId": 1,
+        //                 "userAnswerId": [3]
+        //             },
+        //             {
+        //                 "questionId": 2,
+        //                 "userAnswerId": [6]
+        //             }
+        //         ]
+        // }
+        
+        // console.log("check data before submit", dataQuiz) 
+        let payload = {
+            quizId: +quizId,
+            answers: []
+        }
+        let answers = []
+        if(dataQuiz && dataQuiz.length > 0){
+            dataQuiz.forEach(question => {
+                let questionId = question.questionId
+                let userAnswerId = []
+
+                question.answers.forEach(a => {
+                    if(a.isSelected === true){
+                        userAnswerId.push(a.id)
+                    }
+                })
+                answers.push({
+                    questionId : +questionId,
+                    userAnswerId : userAnswerId
+                })
+            })
+            payload.answers = answers
+            // console.log("final payload: ", answers)
+            //submit api
+            let res = await postSubmitQuiz(payload);
+            console.log("check", res)
+            if(res && res.EC === 0){
+                setDataModalResult({
+                    countCorrect: res.DT.countCorrect,
+                    countTotal: res.DT.countTotal,
+                    quizData: res.DT.quizData
+                })
+                setIsShowModalResult(true)
+            }else{
+                alert("something wrong ")
+            }
+
+
+        }
     }
     const handleCheckBox = (answerId, questionId) => {
         let dataQuizClone = _.cloneDeep(dataQuiz) //react hook doesn't merge state
@@ -93,12 +152,17 @@ const DetailQuiz = (props) => {
                 <div className="footer">
                     <button className="btn btn-secondary" onClick={() => handlePre()}>Previous</button>
                     <button className="btn btn-primary" onClick={() => handleNext()} >Next</button>
-                    <button className="btn btn-warning" onClick={() => handleNext()} >Finish</button>
+                    <button className="btn btn-warning" onClick={() => handleFinishQuiz()} >Finish</button>
                 </div>
             </div>
             <div className="right-content">
                 count down
             </div>
+            <ModalResult
+                show={isShowModalResult}
+                setShow={setIsShowModalResult}
+                dataModalResult={dataModalResult}
+            />
         </div>
     )
 }
