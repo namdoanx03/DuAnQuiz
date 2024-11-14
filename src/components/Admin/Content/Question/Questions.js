@@ -18,7 +18,7 @@ const Questions = () => {
     const[questions, setQuestions] = useState([
         {
             id: uuidv4(),
-            description: "Question 1",
+            description: "",
             imageFile: '',
             imagaName:'',
             answers:[
@@ -30,7 +30,7 @@ const Questions = () => {
             ]
         }
     ])
-    console.log("check question", questions)
+    // console.log("check question", questions)
 
     const handleAddRemoveQuestion = (type, id) => {
         if(type === "ADD"){
@@ -77,6 +77,48 @@ const Questions = () => {
         }
         // console.log("check ", type, questionId, answerId)
     }
+    const handleOnChange = (type, questionId, value) =>{
+        if(type === "QUESTION"){
+            let questionsClone = _.cloneDeep(questions)
+            let index = questionsClone.findIndex(item => item.id === questionId)
+            if(index > -1 ){
+                questionsClone[index].description = value
+                setQuestions(questionsClone)
+            }
+        }
+    }
+    const handleOnChangeFileQuestion = (questionId, event) => {
+        let questionsClone = _.cloneDeep(questions)
+        let index = questionsClone.findIndex(item => item.id === questionId)
+        if (index > -1 && event.target && event.target.files && event.target.files[0]){
+            questionsClone[index].imageFile = event.target.files[0]
+            questionsClone[index].imageName = event.target.files[0].name
+            setQuestions(questionsClone)
+            // console.log('check file ', event.target.files[0])
+        }
+    }
+    const handleAnswerQuestion = (type, answerId, questionId, value) => {
+        let questionsClone = _.cloneDeep(questions)
+        let index = questionsClone.findIndex(item => item.id === questionId)
+        // console.log("Check", type, questionId, answerId, value , index)
+        if (index > -1 ) {
+            questionsClone[index].answers = questionsClone[index].answers.map(answer => {
+                if(answer.id === answerId){
+                    if(type === 'CHECKBOX'){
+                        answer.isCorrect = value
+                    }
+                    if (type === 'INPUT') {
+                        answer.description = value
+                    }
+                }
+                return answer // khong thay doi se tra ra y nguyen
+            })
+            setQuestions(questionsClone)
+        }
+    }
+    const hanleSubmitQuestionForQuiz = () =>{
+        console.log("check question", questions)
+    }
 
     return (
         <div className="question-container">
@@ -101,14 +143,22 @@ const Questions = () => {
                         <div key={question.id} className='q-main mb-4'>
                             <div className='questions-content'>
                                 <div className="form-floating description">
-                                    <input type="text" className="form-control" value={question.description} placeholder="name@example.com" />
+                                    <input type="type" className="form-control" 
+                                    value={question.description} 
+                                    placeholder="name@example.com" 
+                                    onChange={(event) => handleOnChange("QUESTION", question.id, event.target.value)} //question.id: de biet rang thay doi id nao
+                                    />
                                     <label >Question {index + 1} 's Description</label>
                                 </div>
                                 <div className='group-upload'>
-                                    <label >
-                                        <RiImageAddFill className='label-up' /></label>
-                                    <input type={'file'} hidden />
-                                    <span>0 file is uploaded</span>
+                                <label htmlFor={`${question.id}`}>
+                                        <RiImageAddFill className='label-up' />
+                                </label>
+                                    <input type={'file'} hidden 
+                                        id={`${question.id}`}
+                                        onChange={(event) => handleOnChangeFileQuestion(question.id, event)}
+                                    />
+                                    <span>{question.imageName ? question.imageName : '0 file is uploaded'}</span>
                                 </div>
                                 <div className='btn-add '>
                                     <span onClick={() => handleAddRemoveQuestion("ADD", "")}>
@@ -124,12 +174,17 @@ const Questions = () => {
                             {question.answers && question.answers.length > 0 && question.answers.map((answer, index) => {
                                 return (
                                     <div key={answer.id} className='answers-content'>
-                                        <input className="form-check-input isCorrect" type="checkbox" />
+                                        <input className="form-check-input isCorrect" 
+                                            type="checkbox" 
+                                            checked={answer.isCorrect}
+                                            onChange={(event) => handleAnswerQuestion('CHECKBOX', answer.id, question.id, event.target.checked)}
+                                            />
                                         <div className="form-floating answer-name">
                                             <input type="type" 
                                                 className="form-control" 
                                                 placeholder="name@example.com" 
                                                 value={answer.description}
+                                                onChange={(event) => handleAnswerQuestion('INPUT', answer.id, question.id, event.target.value)}
                                                 />
                                             <label >Answer {index + 1}</label>
                                         </div>
@@ -150,7 +205,13 @@ const Questions = () => {
                         </div>
                     )
                 })
-                
+                }
+                {questions && questions.length > 0 &&
+                <div>
+                    <button 
+                    onClick={() => hanleSubmitQuestionForQuiz()}
+                    className='btn btn-warning'>Save Questions</button>
+                </div>
                 }
             </div>
         </div>
