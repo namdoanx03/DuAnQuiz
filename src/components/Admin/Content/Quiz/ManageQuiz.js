@@ -18,17 +18,15 @@ const ManageQuiz = () => {
     const [description, setDescription] = useState('')
     const [type, setType] = useState('')
     const [image, setImage] = useState(null)
-    const [previewImage, setPreviewImage] = useState("")
 
     const handleChangeFile = (event) => {
         if (event.target && event.target.files && event.target.files[0]) {
-            setPreviewImage(URL.createObjectURL(event.target.files[0])) //URL.createObjectURL: tao 1 duong link URl tai localhost duoi dang blod, phia client co the doc va hien thi duoc
             setImage(event.target.files[0])
         }
     }
     const handleSubmitQuiz = async() => {
         //validate
-        if(!name && !description){
+        if(!name || !description){
             toast.error('Name & Description is required')
             return 
         }
@@ -39,7 +37,7 @@ const ManageQuiz = () => {
             toast.success(res.EM)
             setName('')
             setDescription('')
-            setImage('')
+            setImage(null)
         }else{
             toast.error(res.EM)
         }
@@ -72,20 +70,13 @@ const ManageQuiz = () => {
                                         placeholder="Quiz type..."
                                     />
                                 </div>
-                                <div className='more-actions form-group'>
-                                    <div className='"col-md-12'>
-                                        <label className="form-label btn btn-secondary" htmlFor="labelUpload">
-                                            <FaUpload /> Upload File Image
-                                        </label>
-                                    </div>
-                                    <input type='file' className='form-control' id='labelUpload' hidden onChange={(event) => handleChangeFile(event)} />
-                                    <div className='col-md-12 img-preview '>
-                                        {previewImage ?
-                                            <img src={previewImage} />
-                                            :
-                                            <span>Preview Image</span>
-                                        }
-                                    </div>
+                                <div className="more-actions form-group">
+                                    <label className='mb-1'> Upload Image</label>
+                                    <input
+                                        type="file"
+                                        className='form-control'
+                                        onChange={(event) => handleChangeFile(event)}
+                                    />
                                 </div>
                                 <div className='btn btn-warning mt-3' onClick={() => handleSubmitQuiz()}>Save</div>
                             </fieldset>
