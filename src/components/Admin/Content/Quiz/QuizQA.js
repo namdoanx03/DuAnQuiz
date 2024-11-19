@@ -1,16 +1,16 @@
 import Select from 'react-select';
 import { useEffect, useState } from 'react';
-import './Questions.scss'
+import './QuizQA.scss'
 import { BsPlusCircle } from "react-icons/bs";
 import { SlMinus } from "react-icons/sl";
 import { RiImageAddFill } from "react-icons/ri";
 import { v4 as uuidv4 } from 'uuid'; // tao mot id duy nhat khong bi trung
 import _ from 'lodash'
 import Lightbox from "react-awesome-lightbox";
-import { getAllQuizForAdmin, postCreateNewQuestionForQuiz, postCreateNewAnswerForQuestion } from "../../../services/apiService"
+import { getAllQuizForAdmin, postCreateNewQuestionForQuiz, postCreateNewAnswerForQuestion, getQuizWithQA, postUpsertQA } from "../../../services/apiService"
 import { toast } from 'react-toastify';
 
-const Questions = () => {
+const QuizQA = () => {
 
     const [isPreviewImage, setIsPreviewImage] = useState(false)
     const [selectedQuiz, setSelectedQuiz] = useState({})
@@ -39,6 +39,40 @@ const Questions = () => {
     useEffect(()=>{
         fetchQuiz()
     },[])
+
+    useEffect(() => {
+        if(selectedQuiz && selectedQuiz.value){
+            fetchQuizWithQA()
+        }
+    },[selectedQuiz])
+
+    //return a promise that resolves with a file instance
+    function urltoFile(url, filename, mimeType) {
+        return fetch(url)
+            .then(function (res) {return res.arrayBuffer();})
+            .then(function (buf) {return new File([buf], filename, { type: mimeType });});
+    }
+
+
+    const fetchQuizWithQA = async () => {
+        let res = await getQuizWithQA(selectedQuiz.value);
+        if(res && res.EC ===0){
+            //convert base 64 to FIle Object
+            let newQA = []
+            for(let i = 0; i < res.DT.qa.length; i++){
+                let q = res.DT.qa[i]
+                if(q.imageFile){
+                    q.imageName = `Question-${q.id}.png`
+                    q.imageFile = await urltoFile(`data:image/png;base64,${q.imageFile}`,`Question-${q.id}.png`,`image/png`);
+                }
+                newQA.push(q)
+            }
+            setQuestions(newQA)
+            // console.log(">>check newQA: ", newQA)
+            // console.log(">>>check res:, res")
+        }
+    }
+
     const fetchQuiz = async () => {
         setListQuiz({});
         let res = await getAllQuizForAdmin()
@@ -177,24 +211,43 @@ const Questions = () => {
             toast.error(`Not empty description for Question ${indexQ1 + 1}`)
             return 
         }
-
+        let questionClone = _.cloneDeep(questions)
+        for(let i = 0; i< questionClone.length; i++){
+            if(questionClone[i].imageFile){
+                questionClone[i].imageFile = await toBase64(questionClone[i].imageFile)
+            }
+        }
+        let res = await postUpsertQA({
+            questionId: selectedQuiz.value,
+            questions: questionClone
+        })
+        if(res && res.EC === 0){
+            toast.success(res.EM)
+            fetchQuizWithQA()
+        }
 
         // console.log("check question", questions, selectedQuiz)
         // postCreateNewQuestionForQuiz, postCreateNewAnswerForQuestion
 
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+        });
         
         //submit question
-        for(const question of questions){
-            const q = await postCreateNewQuestionForQuiz(
-                +selectedQuiz.value,
-                question.description,
-                question.imageFile)
+        // for(const question of questions){
+        //     const q = await postCreateNewQuestionForQuiz(
+        //         +selectedQuiz.value,
+        //         question.description,
+        //         question.imageFile)
 
-            //submit answer
-            for(const answer of question.answers){
-                await postCreateNewAnswerForQuestion(answer.description, answer.correct_answer, q.DT.id)
-            }
-        }
+        //     //submit answer
+        //     for(const answer of question.answers){
+        //         await postCreateNewAnswerForQuestion(answer.description, answer.correct_answer, q.DT.id)
+        //     }
+        // }
         toast.success('Create question and answer success!')
         setQuestions(initQuestions)
     }
@@ -212,10 +265,6 @@ const Questions = () => {
 
     return (
         <div className="question-container">
-            <div className='title'>
-                Manage Questions
-            </div>
-            <hr/>
             <div className='add-new-question'>
                 <div className='col-6 form-group'>
                     <label className='mb-2'>Select Quiz:</label>
@@ -319,4 +368,4 @@ const Questions = () => {
         </div>
     )
 }
-export default Questions
+export default QuizQA
