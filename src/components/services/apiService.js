@@ -36,7 +36,10 @@ const getUserWithPaginate = (page, limit) => {
 }
 
 const postLogin = (email, password) => {
-    return axios.post(`api/v1//login`, {email, password, delay: 5000}) //dang www-form-urlencoded chi can truyen 1 bien obj
+    return axios.post(`api/v1/login`, {email, password, delay: 5000}) //dang www-form-urlencoded chi can truyen 1 bien obj
+}
+const postLogOut = (email, refresh_token) => {
+    return axios.post(`api/v1/logout`, { email, refresh_token }) //dang www-form-urlencoded chi can truyen 1 bien obj
 }
 const postRegister = (email, password) => {
     return axios.post(`api/v1//register`, {email, password}) 
@@ -99,5 +102,6 @@ const postUpsertQA = (data) => {  //API update and insert QA
 }
 export { postCreateNewUser, getAllUser, putUpdateUser, deleteAUser, getUserWithPaginate, 
     postLogin, postRegister, getQuizByUser, getDataQuiz, postSubmitQuiz, postCreateNewQuiz, 
-    getAllQuizForAdmin, deleteQuizForAdmin, updateQuizForAdmin, postCreateNewQuestionForQuiz, postCreateNewAnswerForQuestion, postAssignQuiz, getQuizWithQA, postUpsertQA
+    getAllQuizForAdmin, deleteQuizForAdmin, updateQuizForAdmin, postCreateNewQuestionForQuiz, 
+    postCreateNewAnswerForQuestion, postAssignQuiz, getQuizWithQA, postUpsertQA, postLogOut
 }
