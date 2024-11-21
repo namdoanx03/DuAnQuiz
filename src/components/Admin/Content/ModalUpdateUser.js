@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import { SlPlus } from "react-icons/sl";
 import { postCreateNewUser, putUpdateUser } from '../../services/apiService';
 import { toast } from 'react-toastify';
-import _ from 'lodash';
+import _ from 'lodash'; // giúp xử lý các tác vụ liên quan đến mảng, đối tượng, chuỗi và các kiểu dữ liệu khác một cách dễ dàng và hiệu quả
 
 const ModalUpdateUser = (props) => {
     const { show, setShow, dataUpdate, currentPage } = props; //lay dc prop tu cha tryen xuong, prop la 1 bien obj
